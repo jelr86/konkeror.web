@@ -14,5 +14,7 @@ namespace konkeror.data.Domain
         public bool Active { get; set; }
         public string UserName { get; set; }
         public string Password { get; set; }
+
+        public virtual ICollection<License> Licenses { get; set; }
     }
 }

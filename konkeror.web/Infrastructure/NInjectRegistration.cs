@@ -19,6 +19,7 @@ namespace konkeror.web.Infrastructure
         public override void Load()
         {
             Bind<IClientRepository>().To<ClientRepository>();
+            Bind<ILicenseRepository>().To<LicenseRepository>();
             Bind<DbContext>().To<konkerorEntities>();
 
             var config = new MapperConfiguration(cfg => cfg.AddProfile<KonkerorAutoMapperProfile>());

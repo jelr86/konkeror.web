@@ -102,6 +102,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\License.cs" />
     <Compile Include="konkerorEntities.cs" />
     <Compile Include="Domain\Client.cs" />
     <Compile Include="Domain\Licencia.cs" />
