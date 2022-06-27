@@ -54,8 +54,8 @@ namespace konkeror.app.Services
                 ExpirationDate = license.ExpirationDate,
                 Active = true,
                 CreatedDate = DateTime.UtcNow,
-                Code = Guid.NewGuid().ToString("N"),
-                ComputerCode = string.Empty
+                Code = Guid.NewGuid(),
+                ComputerCode = Guid.Empty
             };
             _konkerorDb.Licenses.Add(l);
             _konkerorDb.SaveChanges();

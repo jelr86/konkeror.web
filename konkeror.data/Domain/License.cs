@@ -14,9 +14,9 @@ namespace konkeror.data.Domain
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public string Code { get; set; }
+        public Guid Code { get; set; }
         public bool Active { get; set; }
-        public string ComputerCode { get; set; }
+        public Guid ComputerCode { get; set; }
         public virtual Client Client { get; set; }
     }
 }
