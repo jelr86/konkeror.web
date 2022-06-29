@@ -1,14 +1,9 @@
 ﻿using AutoMapper;
-using konkeror.app.Models;
 using konkeror.app.Services.Interface;
-using konkeror.app.Services.Interfaces;
 using konkeror.data;
 using konkeror.data.Domain;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace konkeror.app.Services
 {
@@ -24,33 +19,31 @@ namespace konkeror.app.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<LicenseModel> GetByClient(string clientId, int take = 10)
+        public IQueryable<License> GetByClient(string clientId, int take = -1)
+        {
+            var licenses = _konkerorDb.Licenses
+                .Where(l => l.ClientId.Equals(new Guid(clientId)));
+
+            if (take > 0) licenses.Take(take);
+
+            return licenses;
+        }
+
+        public License Get(string id)
         {
             return _konkerorDb.Licenses
-                .Where(l => l.ClientId.Equals(new Guid(clientId)))
-                .Take(take)
-                .ToList()
-                .Select(c => _mapper.Map<LicenseModel>(c));
-        }
-
-        public LicenseModel Get(string id)
-        {
-            var client = _konkerorDb.Licenses
                 .Where(c => c.ID.Equals(new Guid(id)))
                 .FirstOrDefault();
-
-            return _mapper.Map<LicenseModel>(client);
         }
 
 
-        public CreateLicenseResultModel Create(CreateLicenseModel license)
+        public void Create(License license)
         {
-            //Todo: validate not emtpy name, valid clientid, valid expirationdate
             var l = new License
             {
                 ID = Guid.NewGuid(),
                 Name = license.Name,
-                ClientId = new Guid(license.ClientId),
+                ClientId = license.ClientId,
                 ExpirationDate = license.ExpirationDate,
                 Active = true,
                 CreatedDate = DateTime.UtcNow,
@@ -59,10 +52,9 @@ namespace konkeror.app.Services
             };
             _konkerorDb.Licenses.Add(l);
             _konkerorDb.SaveChanges();
-            return _mapper.Map<CreateLicenseResultModel>(l);
         }
 
-        public void Update(string id, UpdateLicenseModel license)
+        public void Update(string id, License license)
         {
             var lic = _konkerorDb.Licenses
                 .Where(c => c.ID.Equals(new Guid(id)))
@@ -70,6 +62,13 @@ namespace konkeror.app.Services
             lic.Name = license.Name;
             lic.Active = license.Active;
             lic.ExpirationDate = license.ExpirationDate;
+            lic.ModifiedDate = DateTime.Now;
+            _konkerorDb.SaveChanges();
+        }
+
+        public void UpdateComputerCode(License lic, Guid computerCode)
+        {
+            lic.ComputerCode = computerCode;
             lic.ModifiedDate = DateTime.Now;
             _konkerorDb.SaveChanges();
         }

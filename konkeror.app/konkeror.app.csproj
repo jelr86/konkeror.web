@@ -62,11 +62,16 @@
     <Compile Include="Models\UpdateClientModel.cs" />
     <Compile Include="Models\CreateClientModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\Interface\ILicenseService.cs" />
+    <Compile Include="Services\BaseService.cs" />
+    <Compile Include="Services\ServiceResult.cs" />
     <Compile Include="Services\LicenseRepository.cs" />
     <Compile Include="Services\ClientRepository.cs" />
     <Compile Include="Services\Interface\ILicenseRepository.cs" />
     <Compile Include="Services\Interface\ILogger.cs" />
     <Compile Include="Services\Interface\IClientRepository.cs" />
+    <Compile Include="Services\LicenseService.cs" />
+    <Compile Include="Services\ValidationMessage.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\konkeror.data\konkeror.data.csproj">
