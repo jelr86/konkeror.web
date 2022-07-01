@@ -15,5 +15,6 @@ namespace konkeror.app.Services.Interface
         ServiceResult<CreateLicenseResultModel> Create(CreateLicenseModel license);
         ServiceResult<bool> Update(string id, UpdateLicenseModel license);
         ServiceResult<bool> Delete(string id);
+        bool ValidateLicense(string computerCode, string licenseCode);
     }
 }

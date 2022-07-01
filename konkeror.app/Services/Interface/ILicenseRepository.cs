@@ -10,11 +10,12 @@ namespace konkeror.app.Services.Interface
 {
     public interface ILicenseRepository
     {
-        IQueryable<License> GetByClient(string clientId, int take = -1);
+        IEnumerable<License> GetByClient(string clientId, int take = -1);
         License Get(string id);
         void Create(License license);
         void Update(string id, License client);
         void UpdateComputerCode(License lic, Guid computerCode);
         void Delete(string id);
+        License GetByLicenseCode(string licenseCode);
     }
 }

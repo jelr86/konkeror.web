@@ -5,8 +5,6 @@ using konkeror.data.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace konkeror.app.Services
 {
@@ -27,7 +25,7 @@ namespace konkeror.app.Services
             var validationMessages = ValidateRegisterLicenseRequest(clientId, licenseCode, out var license);
             if (validationMessages.Count() > 0 || license == null)
             {
-                result.ValidationMessages = validationMessages?.ToList();
+                result.ValidationMessages = validationMessages.ToList();
                 return result;
             }
 
@@ -51,7 +49,6 @@ namespace konkeror.app.Services
             }
 
             result.Result = _licenseRepo.GetByClient(clientId, take)
-                .ToList()
                 .Select(c => _mapper.Map<LicenseModel>(c));
             
             return result;
@@ -151,7 +148,40 @@ namespace konkeror.app.Services
                 if (license == null)
                     AddValidationMessage(validationMessages, $"No license found with provided code");
             }
-            return validationMessages.Count() > 0 ? validationMessages : null;
+            return validationMessages;
+        }
+
+        public bool ValidateLicense(string computerCode, string licenseCode)
+        {
+            var validationMessages = new List<ValidationMessage>();
+
+            ValidateGuidValue(computerCode, "computerCode", validationMessages);
+            ValidateGuidValue(licenseCode, "licenseCode", validationMessages);
+            if (validationMessages.Count() > 0) return false;
+
+            License license = _licenseRepo.GetByLicenseCode(licenseCode);
+            return license != null &&
+                license.Active == true &&
+                license.ExpirationDate > DateTime.UtcNow &&
+                license.ComputerCode.Equals(computerCode);
+                
+        }
+
+        public ServiceResult<string> ResetLicense(string clientId, string licenseCode)
+        {
+            var result = new ServiceResult<string>();
+
+            var validationMessages = ValidateRegisterLicenseRequest(clientId, licenseCode, out var license);
+            if (validationMessages.Count() > 0 || license == null)
+            {
+                result.ValidationMessages = validationMessages.ToList();
+                return result;
+            }
+
+            var computerCode = Guid.Empty;
+            _licenseRepo.UpdateComputerCode(license, computerCode);
+
+            return result;
         }
     }
 }

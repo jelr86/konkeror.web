@@ -12,6 +12,7 @@ namespace konkeror.web.Infrastructure
             CreateMap<Client, CreateClientModel>().ReverseMap();
 
             CreateMap<License, LicenseModel>().ReverseMap();
+            CreateMap<License, CreateLicenseModel>().ReverseMap();
             CreateMap<License, CreateLicenseResultModel>().ReverseMap();
         }
     }

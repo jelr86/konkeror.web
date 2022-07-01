@@ -25,15 +25,15 @@ namespace konkeror.web.Controllers
             try
             {
                 var lic = _licenseService.GetByClient(clientId, take);
-                if (lic.ValidationMessages.Count > 0)
+                if (lic.ValidationMessages?.Count > 0)
                     return new ErrorResult(lic.ValidationMessages, Request);
                 if (lic.Result == null || lic.Result.Count() == 0)
                     return NotFound();
                 return Ok(lic.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return InternalServerError();
+                return InternalServerError(e);
             }
         }
 
@@ -42,15 +42,15 @@ namespace konkeror.web.Controllers
             try
             {
                 var lic = _licenseService.Get(id);
-                if (lic.ValidationMessages.Count > 0)
+                if (lic.ValidationMessages?.Count > 0)
                     return new ErrorResult(lic.ValidationMessages, Request);
                 if (lic.Result == null)
                     return NotFound();
                 return Ok(lic.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return InternalServerError();
+                return InternalServerError(e);
             }
         }
 
@@ -59,13 +59,13 @@ namespace konkeror.web.Controllers
             try
             {
                 var r = _licenseService.Create(license);
-                if (r.ValidationMessages.Count > 0)
+                if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return InternalServerError();
+                return InternalServerError(e);
             }
         }
 
@@ -74,13 +74,13 @@ namespace konkeror.web.Controllers
             try
             {
                 var r = _licenseService.Update(id, value);
-                if (r.ValidationMessages.Count > 0)
+                if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return InternalServerError();
+                return InternalServerError(e);
             }
         }
 
@@ -89,13 +89,46 @@ namespace konkeror.web.Controllers
             try
             {
                 var r = _licenseService.Delete(id);
-                if (r.ValidationMessages.Count > 0)
+                if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-                return InternalServerError();
+                return InternalServerError(e);
+            }
+        }
+
+        [HttpPut()]
+        [Route("api/licenses/register")]
+        public IHttpActionResult RegisterLicense(string clientId, string licenseCode)
+        {
+            try
+            {
+                var r = _licenseService.RegisterLicense(clientId, licenseCode);
+                if (r.ValidationMessages?.Count > 0)
+                    return new ErrorResult(r.ValidationMessages, Request);
+                return Ok(r.Result);
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
+
+        [HttpGet()]
+        [Route("api/licenses/validate")]
+        public IHttpActionResult ValidateLicense(string computerCode, string licenseCode)
+        {
+            try
+            {
+                if (!_licenseService.ValidateLicense(computerCode, licenseCode))
+                    return NotFound();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
             }
         }
     }

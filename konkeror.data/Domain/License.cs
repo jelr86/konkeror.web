@@ -1,22 +1,27 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace konkeror.data.Domain
 {
     public class License
     {
-        public Guid ID { get; set; }
+        [Key]
+        public string Id { get; set; }
         public string Name { get; set; }
-        public Guid ClientId { get; set; }
+
+        //[Column("clientid")]
+        public string ClientId { get; set; }
         
         public DateTime CreatedDate { get; set; }
         public DateTime ModifiedDate { get; set; }
         public DateTime ExpirationDate { get; set; }
-        public Guid Code { get; set; }
+        public string Code { get; set; }
         public bool Active { get; set; }
-        public Guid ComputerCode { get; set; }
-        public virtual Client Client { get; set; }
+        public string ComputerCode { get; set; }
+        //[ForeignKey("clientid")]
+        //public virtual Client Client { get; set; }
     }
 }

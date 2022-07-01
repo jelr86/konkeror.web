@@ -3,6 +3,7 @@ using konkeror.app.Services.Interface;
 using konkeror.data;
 using konkeror.data.Domain;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace konkeror.app.Services
@@ -19,20 +20,20 @@ namespace konkeror.app.Services
             _mapper = mapper;
         }
 
-        public IQueryable<License> GetByClient(string clientId, int take = -1)
+        public IEnumerable<License> GetByClient(string clientId, int take = -1)
         {
             var licenses = _konkerorDb.Licenses
-                .Where(l => l.ClientId.Equals(new Guid(clientId)));
+               .Where(l => l.ClientId.Equals(clientId));
 
             if (take > 0) licenses.Take(take);
 
-            return licenses;
+            return licenses.ToList();
         }
 
         public License Get(string id)
         {
             return _konkerorDb.Licenses
-                .Where(c => c.ID.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
         }
 
@@ -41,14 +42,14 @@ namespace konkeror.app.Services
         {
             var l = new License
             {
-                ID = Guid.NewGuid(),
+                Id = Guid.NewGuid().ToString(),
                 Name = license.Name,
                 ClientId = license.ClientId,
                 ExpirationDate = license.ExpirationDate,
                 Active = true,
                 CreatedDate = DateTime.UtcNow,
-                Code = Guid.NewGuid(),
-                ComputerCode = Guid.Empty
+                Code = Guid.NewGuid().ToString(),
+                ComputerCode = Guid.Empty.ToString()
             };
             _konkerorDb.Licenses.Add(l);
             _konkerorDb.SaveChanges();
@@ -57,7 +58,7 @@ namespace konkeror.app.Services
         public void Update(string id, License license)
         {
             var lic = _konkerorDb.Licenses
-                .Where(c => c.ID.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
             lic.Name = license.Name;
             lic.Active = license.Active;
@@ -68,7 +69,7 @@ namespace konkeror.app.Services
 
         public void UpdateComputerCode(License lic, Guid computerCode)
         {
-            lic.ComputerCode = computerCode;
+            lic.ComputerCode = computerCode.ToString();
             lic.ModifiedDate = DateTime.Now;
             _konkerorDb.SaveChanges();
         }
@@ -76,10 +77,17 @@ namespace konkeror.app.Services
         public void Delete(string id)
         {
             var lic = _konkerorDb.Licenses
-            .Where(c => c.ID.Equals(new Guid(id)))
+            .Where(c => c.Id.Equals(id))
             .FirstOrDefault();
             _konkerorDb.Licenses.Remove(lic);
             _konkerorDb.SaveChanges();
+        }
+
+        public License GetByLicenseCode(string licenseCode)
+        {
+            return _konkerorDb.Licenses
+                .Where(c => c.Code.Equals(licenseCode))
+                .FirstOrDefault();
         }
     }
 }
