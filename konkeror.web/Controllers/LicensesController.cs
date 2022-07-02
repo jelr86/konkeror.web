@@ -14,17 +14,17 @@ namespace konkeror.web.Controllers
 {
     public class LicensesController : ApiController
     {
-        private ILicenseService _licenseService { get; }
+        private ILicenseService LicenseService { get; }
         public LicensesController(ILicenseService licenseService)
         {
-            _licenseService = licenseService;
+            LicenseService = licenseService;
         }
 
         public IHttpActionResult Get(string clientId, int take)
         {
             try
             {
-                var lic = _licenseService.GetByClient(clientId, take);
+                var lic = LicenseService.GetByClient(clientId, take);
                 if (lic.ValidationMessages?.Count > 0)
                     return new ErrorResult(lic.ValidationMessages, Request);
                 if (lic.Result == null || lic.Result.Count() == 0)
@@ -41,7 +41,7 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                var lic = _licenseService.Get(id);
+                var lic = LicenseService.Get(id);
                 if (lic.ValidationMessages?.Count > 0)
                     return new ErrorResult(lic.ValidationMessages, Request);
                 if (lic.Result == null)
@@ -58,7 +58,7 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                var r = _licenseService.Create(license);
+                var r = LicenseService.Create(license);
                 if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
@@ -73,7 +73,7 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                var r = _licenseService.Update(id, value);
+                var r = LicenseService.Update(id, value);
                 if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
@@ -88,7 +88,7 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                var r = _licenseService.Delete(id);
+                var r = LicenseService.Delete(id);
                 if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
@@ -105,7 +105,7 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                var r = _licenseService.RegisterLicense(clientId, licenseCode);
+                var r = LicenseService.RegisterLicense(clientId, licenseCode);
                 if (r.ValidationMessages?.Count > 0)
                     return new ErrorResult(r.ValidationMessages, Request);
                 return Ok(r.Result);
@@ -122,8 +122,25 @@ namespace konkeror.web.Controllers
         {
             try
             {
-                if (!_licenseService.ValidateLicense(computerCode, licenseCode))
+                if (!LicenseService.ValidateLicense(computerCode, licenseCode))
                     return NotFound();
+                return Ok();
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
+
+        [HttpPut()]
+        [Route("api/licenses/reset")]
+        public IHttpActionResult ResetLicense(string clientId, string licenseCode)
+        {
+            try
+            {
+                var r = LicenseService.ResetLicense(clientId, licenseCode);
+                if (r.ValidationMessages?.Count > 0)
+                    return new ErrorResult(r.ValidationMessages, Request);
                 return Ok();
             }
             catch (Exception e)

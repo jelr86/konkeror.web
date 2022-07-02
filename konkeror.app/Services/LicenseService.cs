@@ -163,6 +163,8 @@ namespace konkeror.app.Services
             return license != null &&
                 license.Active == true &&
                 license.ExpirationDate > DateTime.UtcNow &&
+                !string.IsNullOrEmpty(license.ComputerCode) &&
+                !license.ComputerCode.Equals(Guid.Empty.ToString()) &&
                 license.ComputerCode.Equals(computerCode);
                 
         }
