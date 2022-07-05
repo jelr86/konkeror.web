@@ -102,6 +102,8 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Transaction.cs" />
+    <Compile Include="Domain\Devise.cs" />
     <Compile Include="Domain\License.cs" />
     <Compile Include="konkerorEntities.cs" />
     <Compile Include="Domain\Client.cs" />
