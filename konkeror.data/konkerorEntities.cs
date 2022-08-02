@@ -13,9 +13,11 @@ namespace konkeror.data
         }
 
 
-        public virtual DbSet<Licencia> Licencias { get; set; }
         public virtual DbSet<Client> Clients { get; set; }
         public virtual DbSet<License> Licenses { get; set; }
+        public virtual DbSet<Devise> Devises { get; set; }
+        public virtual DbSet<Product> Products { get; set; }
+        public virtual DbSet<Transaction> Transactions { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {

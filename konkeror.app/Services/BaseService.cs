@@ -22,6 +22,12 @@ namespace konkeror.app.Services
             if (string.IsNullOrEmpty(value))
                 AddValidationMessage(validationMessages, $"{fieldName} was not provided");
         }
+
+        protected void ValidateIntValue(int value, string fieldName, IList<ValidationMessage> validationMessages)
+        {
+            if (value <= 0)
+                AddValidationMessage(validationMessages, $"{fieldName} should be greater than zero");
+        }
         protected void ValidateGuidValue(string value, string fieldName, IList<ValidationMessage> validationMessages)
         {
             ValidateStringValue(value, fieldName, validationMessages);

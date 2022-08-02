@@ -102,12 +102,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Domain\Product.cs" />
     <Compile Include="Domain\Transaction.cs" />
     <Compile Include="Domain\Devise.cs" />
     <Compile Include="Domain\License.cs" />
     <Compile Include="konkerorEntities.cs" />
     <Compile Include="Domain\Client.cs" />
-    <Compile Include="Domain\Licencia.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

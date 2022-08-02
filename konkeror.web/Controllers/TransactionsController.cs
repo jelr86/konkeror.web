@@ -34,20 +34,5 @@ namespace konkeror.web.Controllers
                 return InternalServerError(e);
             }
         }
-
-        [HttpPatch]
-        [Route("api/transations/report")]
-        public IHttpActionResult Report(string transactionId)
-        {
-            try
-            {
-                var r = TransactionService.Report(transactionId);
-                return Ok(r);
-            }
-            catch (Exception e)
-            {
-                return InternalServerError(e);
-            }
-        }
     }
 }

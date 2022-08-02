@@ -9,6 +9,5 @@ namespace konkeror.app.Models
     public class RegisterTransactionResult
     {
         public string Id { get; set; }
-        public int Minutes { get; set; }
     }
 }

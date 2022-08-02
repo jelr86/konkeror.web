@@ -10,6 +10,6 @@ namespace konkeror.app.Models
     {
         public string LicenseId { get; set; }
         public string Devise { get; set; }
-        public int Minutes { get; set; }
+        public string ProductId { get; set; }
     }
 }

@@ -21,6 +21,11 @@ namespace konkeror.web.Infrastructure
             Bind<IClientRepository>().To<ClientRepository>();
             Bind<ILicenseRepository>().To<LicenseRepository>();
             Bind<ILicenseService>().To<LicenseService>();
+            Bind<ITransactionRepository>().To<TransactionRepository>();
+            Bind<ITransactionService>().To<TransactionService>();
+            Bind<IDeviseRepository>().To<DeviseRepository>();
+            Bind<IProductRepository>().To<ProductRepository>();
+            Bind<IProductService>().To<ProductService>();
             Bind<DbContext>().To<konkerorEntities>();
 
             var config = new MapperConfiguration(cfg => cfg.AddProfile<KonkerorAutoMapperProfile>());

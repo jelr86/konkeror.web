@@ -11,79 +11,100 @@ namespace konkeror.app.Services
     public class TransactionService : BaseService, ITransactionService
     {
         private ITransactionRepository TransactionRepository { get; }
+
+        private IProductRepository ProductRepository { get; }
         private IDeviseRepository DeviseRepository { get; }
         private IMapper Mapper { get; }
-        public TransactionService(ITransactionRepository transactionRepo, IDeviseRepository deviseRepo, IMapper mapper)
+        public TransactionService(ITransactionRepository transactionRepo, IDeviseRepository deviseRepo,
+            IProductRepository productRepo, IMapper mapper)
         {
             TransactionRepository = transactionRepo;
             DeviseRepository = deviseRepo;
             Mapper = mapper;
+            ProductRepository = productRepo;
         }
 
         public ServiceResult<RegisterTransactionResult> Register(TransactionModel transaction)
         {
-            //validate transaction request
-
             var serviceRes = new ServiceResult<RegisterTransactionResult>();
             //verify devise exists
             var devise = DeviseRepository.GetDevise(transaction.Devise, transaction.LicenseId);
             if (devise == null)
             {
-                devise = DeviseRepository.Create(Mapper.Map<Devise>(transaction));
+                devise = new Devise() { 
+                    Name = transaction.Devise,
+                    LicenseId = transaction.LicenseId
+                };
+                DeviseRepository.Create(devise);
+            }
+            var validationMessages = new List<ValidationMessage>();
+            var product = GetProduct(transaction.ProductId, validationMessages);
+            if (validationMessages.Count() > 0 || product == null)
+            {
+                serviceRes.ValidationMessages = validationMessages;
+                return serviceRes;
             }
 
-            //verify a current transaction
-            var tr = TransactionRepository.GetLatestByDevise(devise.Id);
-            if (tr != null && IsTransactionCurrent(tr))
-            {
-                tr.StartDate = DateTime.UtcNow.AddMinutes(AvailableMins(tr) * -1);
-                tr.ModifiedDate = DateTime.UtcNow;
-                TransactionRepository.UpdateTime(tr);
-            }
-            else
-                tr = TransactionRepository.Create(Mapper.Map<Transaction>(transaction));
+            var tr = Mapper.Map<Transaction>(transaction);
+            tr.DeviseId = devise.Id;
+            tr.ProductId = product?.Id;
+            TransactionRepository.Create(tr);
                 
             serviceRes.Result = new RegisterTransactionResult()
             {
-                Id = tr.Id,
-                Minutes = AvailableMins(tr)
+                Id = tr.Id
             };
             return serviceRes;
         }
 
-        public void Report(string transactionId)
+        private Product GetProduct(string id, IList<ValidationMessage> validationMessages)
         {
-            Transaction tr = TransactionRepository.Get(transactionId);
-            if (tr != null)
+            ValidateGuidValue(id, "ProductId", validationMessages);
+            if (validationMessages.Count() > 0)
             {
-                if (tr.StartDate.Equals(DateTime.MinValue)) 
-                    tr.StartDate = DateTime.UtcNow;
-                tr.ModifiedDate = DateTime.UtcNow;
-                TransactionRepository.UpdateTime(tr); 
+                return null;
             }
+            var pr = ProductRepository.Get(id);
+            if (pr == null)
+            {
+                AddValidationMessage(validationMessages, "Invalid ProductId");
+            }
+            return pr;
         }
 
-        protected bool IsTransactionCurrent(Transaction tr)
-        {
-            if (tr.StartDate.Equals(DateTime.MinValue) || 
-                tr.ModifiedDate.Equals(DateTime.MinValue)) return true;
-            
-            var isCurrent = tr.StartDate.AddMinutes(tr.Minutes) > DateTime.UtcNow;
-            if (isCurrent)
-            {
-                return AvailableMins(tr) >= 2;
-            }
-            return false;
-        }
+        //public void Report(string transactionId)
+        //{
+        //    Transaction tr = TransactionRepository.Get(transactionId);
+        //    if (tr != null)
+        //    {
+        //        if (tr.StartDate.Equals(DateTime.MinValue)) 
+        //            tr.StartDate = DateTime.UtcNow;
+        //        tr.ModifiedDate = DateTime.UtcNow;
+        //        TransactionRepository.UpdateTime(tr); 
+        //    }
+        //}
 
-        protected int AvailableMins(Transaction tr)
-        {
-            if (tr.StartDate.Equals(DateTime.MinValue) ||
-                tr.ModifiedDate.Equals(DateTime.MinValue)) return tr.Minutes;
-            var elapsedMins = (int)(tr.ModifiedDate - tr.StartDate).TotalMinutes;
+        //protected bool IsTransactionCurrent(Transaction tr)
+        //{
+        //    if (tr.StartDate.Equals(DateTime.MinValue) || 
+        //        tr.ModifiedDate.Equals(DateTime.MinValue)) return true;
             
-            return elapsedMins > tr.Minutes ? 0 :
-                tr.Minutes - elapsedMins;
-        }
+        //    var isCurrent = tr.StartDate.AddMinutes(tr.Minutes) > DateTime.UtcNow;
+        //    if (isCurrent)
+        //    {
+        //        return AvailableMins(tr) >= 2;
+        //    }
+        //    return false;
+        //}
+
+        //protected int AvailableMins(Transaction tr)
+        //{
+        //    if (tr.StartDate.Equals(DateTime.MinValue) ||
+        //        tr.ModifiedDate.Equals(DateTime.MinValue)) return tr.Minutes;
+        //    var elapsedMins = (int)(tr.ModifiedDate - tr.StartDate).TotalMinutes;
+            
+        //    return elapsedMins > tr.Minutes ? 0 :
+        //        tr.Minutes - elapsedMins;
+        //}
     }
 }

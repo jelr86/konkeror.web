@@ -11,6 +11,7 @@ namespace konkeror.app.Services.Interface
     public interface IDeviseRepository
     {
         Devise GetDevise(string name, string licenseId);
-        Devise Create(Devise devise);
+        void Create(Devise devise);
+        IEnumerable<Devise> Get(int page, int take);
     }
 }

@@ -10,6 +10,5 @@ namespace konkeror.app.Services.Interface
     public interface ITransactionService
     {
         ServiceResult<RegisterTransactionResult> Register(TransactionModel transaction);
-        void Report(string transactionId);
     }
 }

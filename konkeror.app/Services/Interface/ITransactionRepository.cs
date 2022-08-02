@@ -11,7 +11,7 @@ namespace konkeror.app.Services.Interface
     public interface ITransactionRepository
     {
         Transaction GetLatestByDevise(string deviseId);
-        Transaction Create(Transaction transaction);
+        void Create(Transaction transaction);
         Transaction Get(string transactionId);
         void UpdateTime(Transaction tr);
     }
