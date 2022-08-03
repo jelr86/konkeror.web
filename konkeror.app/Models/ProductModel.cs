@@ -9,7 +9,7 @@ namespace konkeror.app.Models
     {
         public string ID { get; set; }
         public string Name { get; set; }
-        public string Minutes { get; set; }
-        public bool PlayersQty { get; set; }
+        public int Minutes { get; set; }
+        public int PlayersQty { get; set; }
     }
 }

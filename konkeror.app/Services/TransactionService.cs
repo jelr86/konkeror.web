@@ -11,22 +11,35 @@ namespace konkeror.app.Services
     public class TransactionService : BaseService, ITransactionService
     {
         private ITransactionRepository TransactionRepository { get; }
-
         private IProductRepository ProductRepository { get; }
         private IDeviseRepository DeviseRepository { get; }
+        private ILicenseRepository LicenseRepository { get; }
         private IMapper Mapper { get; }
+
+        private Product Product { get; set; }
+        private License License { get; set; }
         public TransactionService(ITransactionRepository transactionRepo, IDeviseRepository deviseRepo,
-            IProductRepository productRepo, IMapper mapper)
+            IProductRepository productRepo, ILicenseRepository licenseRepository, IMapper mapper)
         {
             TransactionRepository = transactionRepo;
             DeviseRepository = deviseRepo;
             Mapper = mapper;
             ProductRepository = productRepo;
+            LicenseRepository = licenseRepository;
         }
 
         public ServiceResult<RegisterTransactionResult> Register(TransactionModel transaction)
         {
+            Product = null;
             var serviceRes = new ServiceResult<RegisterTransactionResult>();
+            var validationMessages = new List<ValidationMessage>();
+            ValidateRequest(transaction, validationMessages);
+            if (validationMessages.Count() > 0 || Product == null)
+            {
+                serviceRes.ValidationMessages = validationMessages;
+                return serviceRes;
+            }
+
             //verify devise exists
             var devise = DeviseRepository.GetDevise(transaction.Devise, transaction.LicenseId);
             if (devise == null)
@@ -37,17 +50,10 @@ namespace konkeror.app.Services
                 };
                 DeviseRepository.Create(devise);
             }
-            var validationMessages = new List<ValidationMessage>();
-            var product = GetProduct(transaction.ProductId, validationMessages);
-            if (validationMessages.Count() > 0 || product == null)
-            {
-                serviceRes.ValidationMessages = validationMessages;
-                return serviceRes;
-            }
-
+            
             var tr = Mapper.Map<Transaction>(transaction);
             tr.DeviseId = devise.Id;
-            tr.ProductId = product?.Id;
+            tr.ProductId = Product?.Id;
             TransactionRepository.Create(tr);
                 
             serviceRes.Result = new RegisterTransactionResult()
@@ -56,21 +62,49 @@ namespace konkeror.app.Services
             };
             return serviceRes;
         }
+        
+        private void ValidateRequest(TransactionModel tr, IList<ValidationMessage> validationMessages)
+        {
+            GetLicense(tr.LicenseId, validationMessages);
+            GetProduct(tr.ProductId, validationMessages);
+            ValidateStringValue(tr.Devise, "Devise", validationMessages);
+        }
 
-        private Product GetProduct(string id, IList<ValidationMessage> validationMessages)
+        private void GetProduct(string id, IList<ValidationMessage> validationMessages)
         {
             ValidateGuidValue(id, "ProductId", validationMessages);
             if (validationMessages.Count() > 0)
             {
-                return null;
+                return;
             }
             var pr = ProductRepository.Get(id);
             if (pr == null)
             {
                 AddValidationMessage(validationMessages, "Invalid ProductId");
             }
-            return pr;
+            Product = pr;
         }
+
+        private void GetLicense(string id, IList<ValidationMessage> validationMessages)
+        {
+            ValidateGuidValue(id, "LicenseId", validationMessages);
+            if (validationMessages.Count() > 0)
+            {
+                return;
+            }
+            var license = LicenseRepository.Get(id);
+            if (license == null)
+            {
+                AddValidationMessage(validationMessages, "Invalid LicenseId");
+            }
+
+            if (!license.Active || license.ExpirationDate < DateTime.UtcNow)
+            {
+                AddValidationMessage(validationMessages, "License inactive or expired");
+            }
+            License = license;
+        }
+
 
         //public void Report(string transactionId)
         //{

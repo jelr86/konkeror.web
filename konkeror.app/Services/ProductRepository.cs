@@ -32,7 +32,7 @@ namespace konkeror.app.Services
         public Product Get(string id)
         {
             var prod = _konkerorDb.Products
-                .Where(c => c.Id.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
 
             return prod;
@@ -49,7 +49,7 @@ namespace konkeror.app.Services
         public void Update(string id, Product product)
         {
             var prod = _konkerorDb.Products
-                .Where(c => c.Id.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
             prod.Name = product.Name;
             prod.Minutes = product.Minutes;
@@ -60,7 +60,7 @@ namespace konkeror.app.Services
         public void Delete(string id)
         {
             var prod = _konkerorDb.Products
-            .Where(c => c.Id.Equals(new Guid(id)))
+            .Where(c => c.Id.Equals(id))
             .FirstOrDefault();
             _konkerorDb.Products.Remove(prod);
             _konkerorDb.SaveChanges();

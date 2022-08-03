@@ -35,7 +35,7 @@ namespace konkeror.app.Services
         public ClientModel Get(string id)
         {
             var client = _konkerorDb.Clients
-                .Where(c => c.Id.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
 
             return _mapper.Map<ClientModel>(client);
@@ -54,7 +54,7 @@ namespace konkeror.app.Services
         public void Update(string id, UpdateClientModel client)
         {
             var cli = _konkerorDb.Clients
-                .Where(c => c.Id.Equals(new Guid(id)))
+                .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
             cli.Name = client.Name;
             cli.Nit = client.Nit;
@@ -67,7 +67,7 @@ namespace konkeror.app.Services
         public void Delete(string id)
         {
             var cli = _konkerorDb.Clients
-            .Where(c => c.Id.Equals(new Guid(id)))
+            .Where(c => c.Id.Equals(id))
             .FirstOrDefault();
             _konkerorDb.Clients.Remove(cli);
             _konkerorDb.SaveChanges();

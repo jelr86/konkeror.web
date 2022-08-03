@@ -20,9 +20,7 @@ namespace konkeror.web.Controllers
             TransactionService = transactionService;
         }
 
-        [HttpPost]
-        [Route("api/transations/register")]
-        public IHttpActionResult Register([FromBody] TransactionModel transaction)
+        public IHttpActionResult Post([FromBody] TransactionModel transaction)
         {
             try
             {

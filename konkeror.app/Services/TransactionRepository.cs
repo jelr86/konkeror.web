@@ -29,7 +29,7 @@ namespace konkeror.app.Services
         public Transaction Get(string transactionId)
         {
             var tr = _konkerorDb.Transactions
-                .Where(c => c.Id.Equals(new Guid(transactionId)))
+                .Where(c => c.Id.Equals(transactionId))
                 .FirstOrDefault();
 
             return tr;
@@ -38,7 +38,7 @@ namespace konkeror.app.Services
         public Transaction GetLatestByDevise(string deviseId)
         {
             var tr = _konkerorDb.Transactions
-                .Where(c => c.DeviseId.Equals(new Guid(deviseId)))
+                .Where(c => c.DeviseId.Equals(deviseId))
                 .OrderBy(c=> c.CreatedDate)
                 .FirstOrDefault();
 
