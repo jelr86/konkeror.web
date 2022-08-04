@@ -1,4 +1,5 @@
 ﻿using konkeror.app.Models;
+using konkeror.data.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,10 +10,10 @@ namespace konkeror.app.Services.Interface
 {
     public interface IClientRepository
     {
-        IEnumerable<ClientModel> Get(int page, int take);
-        ClientModel Get(string id);
-        void Create(CreateClientModel client);
-        void Update(string id, UpdateClientModel client);
+        IEnumerable<Client> Get(int page, int take);
+        Client Get(string id);
+        void Create(Client client);
+        void Update(string id, Client client);
         void Delete(string id);
     }
 }

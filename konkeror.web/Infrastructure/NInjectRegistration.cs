@@ -19,6 +19,7 @@ namespace konkeror.web.Infrastructure
         public override void Load()
         {
             Bind<IClientRepository>().To<ClientRepository>();
+            Bind<IClientService>().To<ClientService>();
             Bind<ILicenseRepository>().To<LicenseRepository>();
             Bind<ILicenseService>().To<LicenseService>();
             Bind<ITransactionRepository>().To<TransactionRepository>();

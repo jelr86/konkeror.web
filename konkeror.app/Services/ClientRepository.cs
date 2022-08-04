@@ -24,34 +24,32 @@ namespace konkeror.app.Services
             _mapper = mapper;
         }
 
-        public IEnumerable<ClientModel> Get(int page, int take)
+        public IEnumerable<Client> Get(int page, int take)
         {
             return _konkerorDb.Clients
                 //.Skip(page*take)
-                .Take(take).ToList()
-                .Select(c => _mapper.Map<ClientModel>(c));
+                .Take(take).ToList();
         }
 
-        public ClientModel Get(string id)
+        public Client Get(string id)
         {
             var client = _konkerorDb.Clients
                 .Where(c => c.Id.Equals(id))
                 .FirstOrDefault();
 
-            return _mapper.Map<ClientModel>(client);
+            return client;
         }
 
 
-        public void Create(CreateClientModel client)
+        public void Create(Client client)
         {
-            var c = _mapper.Map<Client>(client);
-            c.Id = Guid.NewGuid().ToString();
-            c.Active = true;
-            _konkerorDb.Clients.Add(c);
+            client.Id = Guid.NewGuid().ToString();
+            client.Active = true;
+            _konkerorDb.Clients.Add(client);
             _konkerorDb.SaveChanges();
         }
 
-        public void Update(string id, UpdateClientModel client)
+        public void Update(string id, Client client)
         {
             var cli = _konkerorDb.Clients
                 .Where(c => c.Id.Equals(id))

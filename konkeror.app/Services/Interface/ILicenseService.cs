@@ -1,4 +1,5 @@
 ﻿using konkeror.app.Models;
+using konkeror.data.Domain;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,6 +17,7 @@ namespace konkeror.app.Services.Interface
         ServiceResult<bool> Update(string id, UpdateLicenseModel license);
         ServiceResult<bool> Delete(string id);
         bool ValidateLicense(string computerCode, string licenseCode);
+        bool LicenseIsValid(License license);
         ServiceResult<string> ResetLicense(string clientId, string licenseCode);
     }
 }

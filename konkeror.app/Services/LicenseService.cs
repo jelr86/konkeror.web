@@ -160,14 +160,23 @@ namespace konkeror.app.Services
             if (validationMessages.Count() > 0) return false;
 
             License license = _licenseRepo.GetByLicenseCode(licenseCode);
+            return LicenseIsValid(license) &&
+                license.ComputerCode.Equals(computerCode);
+                
+        }
+
+        public bool LicenseIsValid(License license)
+        {
+
             return license != null &&
                 license.Active == true &&
                 license.ExpirationDate > DateTime.UtcNow &&
                 !string.IsNullOrEmpty(license.ComputerCode) &&
-                !license.ComputerCode.Equals(Guid.Empty.ToString()) &&
-                license.ComputerCode.Equals(computerCode);
-                
+                !license.ComputerCode.Equals(Guid.Empty.ToString());
+
         }
+
+
 
         public ServiceResult<string> ResetLicense(string clientId, string licenseCode)
         {

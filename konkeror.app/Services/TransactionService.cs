@@ -13,19 +13,17 @@ namespace konkeror.app.Services
         private ITransactionRepository TransactionRepository { get; }
         private IProductRepository ProductRepository { get; }
         private IDeviseRepository DeviseRepository { get; }
-        private ILicenseRepository LicenseRepository { get; }
+        private ILicenseService LicenseService { get; }
         private IMapper Mapper { get; }
-
         private Product Product { get; set; }
-        private License License { get; set; }
         public TransactionService(ITransactionRepository transactionRepo, IDeviseRepository deviseRepo,
-            IProductRepository productRepo, ILicenseRepository licenseRepository, IMapper mapper)
+            IProductRepository productRepo, ILicenseService licenseService, IMapper mapper)
         {
             TransactionRepository = transactionRepo;
             DeviseRepository = deviseRepo;
-            Mapper = mapper;
             ProductRepository = productRepo;
-            LicenseRepository = licenseRepository;
+            LicenseService = licenseService;
+            Mapper = mapper;
         }
 
         public ServiceResult<RegisterTransactionResult> Register(TransactionModel transaction)
@@ -53,7 +51,7 @@ namespace konkeror.app.Services
             
             var tr = Mapper.Map<Transaction>(transaction);
             tr.DeviseId = devise.Id;
-            tr.ProductId = Product?.Id;
+            tr.ProductId = Product.Id;
             TransactionRepository.Create(tr);
                 
             serviceRes.Result = new RegisterTransactionResult()
@@ -65,12 +63,12 @@ namespace konkeror.app.Services
         
         private void ValidateRequest(TransactionModel tr, IList<ValidationMessage> validationMessages)
         {
-            GetLicense(tr.LicenseId, validationMessages);
-            GetProduct(tr.ProductId, validationMessages);
+            ValidateLicense(tr.LicenseId, validationMessages);
+            ValidateProduct(tr.ProductId, validationMessages);
             ValidateStringValue(tr.Devise, "Devise", validationMessages);
         }
 
-        private void GetProduct(string id, IList<ValidationMessage> validationMessages)
+        private void ValidateProduct(string id, IList<ValidationMessage> validationMessages)
         {
             ValidateGuidValue(id, "ProductId", validationMessages);
             if (validationMessages.Count() > 0)
@@ -85,24 +83,25 @@ namespace konkeror.app.Services
             Product = pr;
         }
 
-        private void GetLicense(string id, IList<ValidationMessage> validationMessages)
+        private void ValidateLicense(string id, IList<ValidationMessage> validationMessages)
         {
             ValidateGuidValue(id, "LicenseId", validationMessages);
             if (validationMessages.Count() > 0)
             {
                 return;
             }
-            var license = LicenseRepository.Get(id);
+
+            
+            var license = LicenseService.Get(id).Result;
             if (license == null)
             {
                 AddValidationMessage(validationMessages, "Invalid LicenseId");
             }
 
-            if (!license.Active || license.ExpirationDate < DateTime.UtcNow)
+            if (!LicenseService.LicenseIsValid(Mapper.Map<License>(license)))
             {
                 AddValidationMessage(validationMessages, "License inactive or expired");
             }
-            License = license;
         }
 
 

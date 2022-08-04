@@ -7,66 +7,99 @@ using System.Web.Http;
 using AutoMapper;
 using konkeror.app.Models;
 using konkeror.app.Services.Interface;
+using konkeror.web.Common;
 
 namespace konkeror.web.Controllers
 {
     public class ClientsController : ApiController
     {
-        private IClientRepository _clientRepo { get; }
-        public ClientsController(IClientRepository repo)
+        private IClientService ClientService { get; }
+        public ClientsController(IClientService service)
         {
-            _clientRepo = repo;
+            ClientService = service;
         }
 
         // GET api/values
-        public IEnumerable<ClientModel> Get(int page, int take)
-        {
-            return _clientRepo.Get(page, take) ;
-        }
-
-        // GET api/values/5
-        public ClientModel Get(string id)
-        {
-            
-            return _clientRepo.Get(id);
-        }
-
-        // POST api/values
-        public void Post([FromBody] CreateClientModel client)
+        public IHttpActionResult Get(int page, int take)
         {
             try
             {
-                _clientRepo.Create(client);
+                var clis = ClientService.Get(take);
+                if (clis.ValidationMessages?.Count > 0)
+                    return new ErrorResult(clis.ValidationMessages, Request);
+                if (clis.Result == null || clis.Result.Count() == 0)
+                    return NotFound();
+                return Ok(clis.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
+                return InternalServerError(e);
+            }
+        }
 
+        // GET api/values/5
+        public IHttpActionResult Get(string id)
+        {
+            try
+            {
+                var cli = ClientService.Get(id);
+                if (cli.ValidationMessages?.Count > 0)
+                    return new ErrorResult(cli.ValidationMessages, Request);
+                if (cli.Result == null)
+                    return NotFound();
+                return Ok(cli.Result);
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
+
+        // POST api/values
+        public IHttpActionResult Post([FromBody] CreateClientModel client)
+        {
+            try
+            {
+                var r = ClientService.Create(client);
+                if (r.ValidationMessages?.Count > 0)
+                    return new ErrorResult(r.ValidationMessages, Request);
+                return Ok(r.Result);
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
             }
         }
 
         // PUT api/values/5
-        public void Put(string id, [FromBody] UpdateClientModel value)
+        public IHttpActionResult Put(string id, [FromBody] UpdateClientModel value)
         {
             try
             {
-                _clientRepo.Update(id, value);
+                var r = ClientService.Update(id, value);
+                if (r.ValidationMessages?.Count > 0)
+                    return new ErrorResult(r.ValidationMessages, Request);
+                return Ok(r.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                return InternalServerError(e);
             }
         }
 
         // DELETE api/values/5
-        public void Delete(string id)
+        public IHttpActionResult Delete(string id)
         {
             try
             {
-                _clientRepo.Delete(id);
+                var r = ClientService.Delete(id);
+                if (r.ValidationMessages?.Count > 0)
+                    return new ErrorResult(r.ValidationMessages, Request);
+                return Ok(r.Result);
             }
-            catch (Exception)
+            catch (Exception e)
             {
-
+                return InternalServerError(e);
             }
         }
     }
