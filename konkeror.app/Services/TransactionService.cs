@@ -48,6 +48,23 @@ namespace konkeror.app.Services
                 };
                 DeviseRepository.Create(devise);
             }
+            if (transaction.ForceNew)
+            {
+                TransactionRepository.CloseAllOpenTransactionForDevise(devise.Id);
+            }
+            else
+            {
+                var latestTr = TransactionRepository.GetLatestByDevise(devise.Id);
+                if (latestTr != null && !latestTr.Closed)
+                {
+                    serviceRes.Result = new RegisterTransactionResult()
+                    {
+                        Id = latestTr.Id,
+                        IsNew = false
+                    };
+                    return serviceRes;
+                }
+            }
             
             var tr = Mapper.Map<Transaction>(transaction);
             tr.DeviseId = devise.Id;
@@ -56,11 +73,29 @@ namespace konkeror.app.Services
                 
             serviceRes.Result = new RegisterTransactionResult()
             {
-                Id = tr.Id
+                Id = tr.Id,
+                IsNew = true
             };
             return serviceRes;
         }
-        
+
+        public ServiceResult<bool> CloseTransaction(string transactionId)
+        {
+            Product = null;
+            var serviceRes = new ServiceResult<bool>();
+            var validationMessages = new List<ValidationMessage>();
+            ValidateGuidValue(transactionId, "transactionId", validationMessages);
+            if (validationMessages.Count() > 0)
+            {
+                serviceRes.ValidationMessages = validationMessages;
+                return serviceRes;
+            }
+
+            TransactionRepository.CloseTransaction(transactionId);
+            serviceRes.Result = true;
+            return serviceRes;
+        }
+
         private void ValidateRequest(TransactionModel tr, IList<ValidationMessage> validationMessages)
         {
             ValidateLicense(tr.LicenseId, validationMessages);
@@ -98,46 +133,10 @@ namespace konkeror.app.Services
                 AddValidationMessage(validationMessages, "Invalid LicenseId");
             }
 
-            if (!LicenseService.LicenseIsValid(Mapper.Map<License>(license)))
+            if (!LicenseService.LicenseIsValid(license.Id))
             {
                 AddValidationMessage(validationMessages, "License inactive or expired");
             }
         }
-
-
-        //public void Report(string transactionId)
-        //{
-        //    Transaction tr = TransactionRepository.Get(transactionId);
-        //    if (tr != null)
-        //    {
-        //        if (tr.StartDate.Equals(DateTime.MinValue)) 
-        //            tr.StartDate = DateTime.UtcNow;
-        //        tr.ModifiedDate = DateTime.UtcNow;
-        //        TransactionRepository.UpdateTime(tr); 
-        //    }
-        //}
-
-        //protected bool IsTransactionCurrent(Transaction tr)
-        //{
-        //    if (tr.StartDate.Equals(DateTime.MinValue) || 
-        //        tr.ModifiedDate.Equals(DateTime.MinValue)) return true;
-            
-        //    var isCurrent = tr.StartDate.AddMinutes(tr.Minutes) > DateTime.UtcNow;
-        //    if (isCurrent)
-        //    {
-        //        return AvailableMins(tr) >= 2;
-        //    }
-        //    return false;
-        //}
-
-        //protected int AvailableMins(Transaction tr)
-        //{
-        //    if (tr.StartDate.Equals(DateTime.MinValue) ||
-        //        tr.ModifiedDate.Equals(DateTime.MinValue)) return tr.Minutes;
-        //    var elapsedMins = (int)(tr.ModifiedDate - tr.StartDate).TotalMinutes;
-            
-        //    return elapsedMins > tr.Minutes ? 0 :
-        //        tr.Minutes - elapsedMins;
-        //}
     }
 }

@@ -9,5 +9,6 @@ namespace konkeror.app.Models
     public class RegisterTransactionResult
     {
         public string Id { get; set; }
+        public bool IsNew { get; set; }
     }
 }

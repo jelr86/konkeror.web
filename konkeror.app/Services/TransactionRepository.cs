@@ -38,16 +38,29 @@ namespace konkeror.app.Services
         public Transaction GetLatestByDevise(string deviseId)
         {
             var tr = _konkerorDb.Transactions
-                .Where(c => c.DeviseId.Equals(deviseId))
-                .OrderBy(c=> c.CreatedDate)
+                .Where(c => c.DeviseId.Equals(deviseId)
+                    && c.Closed.Equals(false))
+                .OrderByDescending(c=> c.CreatedDate)
                 .FirstOrDefault();
 
             return tr;
         }
 
-        public void UpdateTime(Transaction tr)
+        public void CloseTransaction(string transactionId)
         {
-            throw new NotImplementedException();
+            var tr = Get(transactionId);
+            tr.Closed = true;
+            tr.ModifiedDate = DateTime.UtcNow;
+            _konkerorDb.SaveChanges();
+        }
+
+        public void CloseAllOpenTransactionForDevise(string deviseId)
+        {
+            var trs = _konkerorDb.Transactions
+                .Where(c => c.DeviseId.Equals(deviseId)
+                 && c.Closed.Equals(false)).ToList();
+            trs.ForEach(t => t.Closed = true);
+            _konkerorDb.SaveChanges();
         }
     }
 }

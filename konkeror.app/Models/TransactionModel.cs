@@ -11,5 +11,6 @@ namespace konkeror.app.Models
         public string LicenseId { get; set; }
         public string Devise { get; set; }
         public string ProductId { get; set; }
+        public bool ForceNew { get; set; }
     }
 }

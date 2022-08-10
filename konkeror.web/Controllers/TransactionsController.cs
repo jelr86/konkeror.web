@@ -32,5 +32,18 @@ namespace konkeror.web.Controllers
                 return InternalServerError(e);
             }
         }
+
+        public IHttpActionResult Put(string transactionId)
+        {
+            try
+            {
+                var r = TransactionService.CloseTransaction(transactionId);
+                return Ok(r);
+            }
+            catch (Exception e)
+            {
+                return InternalServerError(e);
+            }
+        }
     }
 }

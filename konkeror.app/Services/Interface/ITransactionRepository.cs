@@ -13,6 +13,7 @@ namespace konkeror.app.Services.Interface
         Transaction GetLatestByDevise(string deviseId);
         void Create(Transaction transaction);
         Transaction Get(string transactionId);
-        void UpdateTime(Transaction tr);
+        void CloseTransaction(string transactionId);
+        void CloseAllOpenTransactionForDevise(string deviseId);
     }
 }

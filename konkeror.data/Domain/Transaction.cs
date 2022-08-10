@@ -16,6 +16,7 @@ namespace konkeror.data.Domain
         public DateTime CreatedDate { get; set; }
         public DateTime StartDate { get; set; }
         public DateTime ModifiedDate { get; set; }
+        public bool Closed { get; set; }
 
 
 

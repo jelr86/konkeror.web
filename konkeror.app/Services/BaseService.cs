@@ -15,7 +15,7 @@ namespace konkeror.app.Services
         protected void ValidateDateTimeValue(DateTime value, string fieldName, IList<ValidationMessage> validationMessages)
         {
             if (value.Equals(DateTime.MinValue))
-                AddValidationMessage(validationMessages, $"{fieldName} {value} is not a valid date", $"Provided a valid date for {fieldName}");
+                AddValidationMessage(validationMessages, $"{fieldName} {value} is not a valid date", $"Provide a valid date for {fieldName}");
         }
         protected void ValidateStringValue(string value, string fieldName, IList<ValidationMessage> validationMessages)
         {

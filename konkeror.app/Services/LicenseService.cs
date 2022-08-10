@@ -176,6 +176,11 @@ namespace konkeror.app.Services
 
         }
 
+        public bool LicenseIsValid(string licenseId)
+        {
+            var license = _licenseRepo.Get(licenseId);
+            return LicenseIsValid(license);
+        }
 
 
         public ServiceResult<string> ResetLicense(string clientId, string licenseCode)
